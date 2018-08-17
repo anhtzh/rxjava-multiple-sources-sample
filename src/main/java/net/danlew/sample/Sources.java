@@ -2,6 +2,8 @@ package net.danlew.sample;
 
 import io.reactivex.Observable;
 import io.reactivex.ObservableTransformer;
+import io.reactivex.Single;
+import io.reactivex.SingleTransformer;
 
 /**
  * Simulates three different sources - one from memory, one from disk,
@@ -30,6 +32,7 @@ public class Sources {
     }
 
     public Observable<Data> memory() {
+        System.out.println("\n[1] reaching memory...");
         Observable<Data> observable = Observable.create(subscriber -> {
             if (memory != null) {
                 subscriber.onNext(memory);
@@ -41,6 +44,7 @@ public class Sources {
     }
 
     public Observable<Data> disk() {
+        System.out.println("\n[2] reaching disk...");
         Observable<Data> observable = Observable.create(subscriber -> {
             if (disk != null) {
                 subscriber.onNext(disk);
@@ -55,9 +59,10 @@ public class Sources {
     }
 
     public Observable<Data> network() {
+        System.out.println("\n[3] reaching network...");
         Observable<Data> observable = Observable.create(subscriber -> {
             requestNumber++;
-            subscriber.onNext(new Data("Server Response #" + requestNumber));
+            subscriber.onNext(new Data("\nServer Response #" + requestNumber));
             subscriber.onComplete();
         });
 
@@ -73,11 +78,11 @@ public class Sources {
     ObservableTransformer<Data, Data> logSource(final String source) {
         return dataObservable -> dataObservable.doOnNext(data -> {
             if (data == null) {
-                System.out.println(source + " does not have any data.\n");
+                System.out.println("\n" + source + " does not have any data.");
             } else if (!data.isUpToDate()) {
-                System.out.println(source + " has stale data.\n");
+                System.out.println("\n" + source + " has stale data.");
             } else {
-                System.out.println(source + " has the data you are looking for\n");
+                System.out.println("\n" + source + " has the data you are looking for!");
             }
         });
     }

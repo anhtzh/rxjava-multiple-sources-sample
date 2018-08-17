@@ -9,18 +9,9 @@ public class Sample {
     public static void main(String[] args) {
         Sources sources = new Sources();
 
-        // Create our sequence for querying best available data
-        Observable<Data> source = Observable.concat(
-                sources.memory(),
-                sources.disk(),
-                sources.network()
-        )
-                .filter(data -> data != null && data.isUpToDate())
-                .firstElement().toObservable();
-
         // "Request" latest data once a second
         Observable.interval(1, TimeUnit.SECONDS)
-                .flatMap(__ -> source)
+                .flatMap(__ -> getSources(sources))
                 .subscribe(data -> System.out.println("Received: " + data.value));
 
         // Occasionally clear memory (as if app restarted) so that we must go to disk
@@ -37,6 +28,19 @@ public class Sample {
         } catch (InterruptedException e) {
             // Ignore
         }
+    }
+
+    static Observable<Data> getSources(Sources sources) {
+        // Create our sequence for querying best available data
+        Observable<Data> multiSources = Observable.concat(
+                sources.memory(),
+                sources.disk(),
+                sources.network()
+        )
+                .filter(data -> data != null && data.isUpToDate())
+                .firstElement().toObservable();
+
+        return multiSources;
     }
 
 }
