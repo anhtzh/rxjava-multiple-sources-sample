@@ -9,7 +9,7 @@ repositories {
 }
 
 dependencies {
-    compile 'io.reactivex:rxjava:1.0.12'
+    compile 'io.reactivex.rxjava2:rxjava:2.1.0'
 }
 
 task run(type:JavaExec) {

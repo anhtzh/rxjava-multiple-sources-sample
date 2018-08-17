@@ -1,6 +1,6 @@
 package net.danlew.sample;
 
-import rx.Observable;
+import io.reactivex.Observable;
 
 import java.util.concurrent.TimeUnit;
 
@@ -14,17 +14,18 @@ public class Sample {
                 sources.memory(),
                 sources.disk(),
                 sources.network()
-            )
-            .first(data -> data != null && data.isUpToDate());
+        )
+                .filter(data -> data != null && data.isUpToDate())
+                .firstElement().toObservable();
 
         // "Request" latest data once a second
         Observable.interval(1, TimeUnit.SECONDS)
-            .flatMap(__ -> source)
-            .subscribe(data -> System.out.println("Received: " + data.value));
+                .flatMap(__ -> source)
+                .subscribe(data -> System.out.println("Received: " + data.value));
 
         // Occasionally clear memory (as if app restarted) so that we must go to disk
         Observable.interval(3, TimeUnit.SECONDS)
-            .subscribe(__ -> sources.clearMemory());
+                .subscribe(__ -> sources.clearMemory());
 
         // Java will quit unless we idle
         sleep(15 * 1000);
@@ -33,8 +34,7 @@ public class Sample {
     static void sleep(long millis) {
         try {
             Thread.sleep(millis);
-        }
-        catch (InterruptedException e) {
+        } catch (InterruptedException e) {
             // Ignore
         }
     }
